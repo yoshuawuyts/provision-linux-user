@@ -1,0 +1,11 @@
+Usage: provision-linux-user <remote>
+
+Options:
+  -h, --help   output usage information
+
+Examples:
+  $ provision-linux-user usr@127.0.0.1   # provision a new user on localhost
+  $ provision-linux-user myremote        # provision a new user on "myremote"
+
+Docs: https://github.com/yoshuawuyts/provision-linux-user
+Bugs: https://github.com/yoshuawuyts/provision-linux-user/issues

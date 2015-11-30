@@ -1,0 +1,2 @@
+source ~/.profile   # Get the paths
+source ~/.shrc      # get aliases

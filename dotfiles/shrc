@@ -1,0 +1,8 @@
+# utf-8 support
+LC_ALL="C.UTF-8"
+
+# aliases
+alias la="ls -oahpln --color=auto --group-directories-first -o"
+alias e="vim"
+alias g="git"
+alias s="git status"

@@ -1,0 +1,39 @@
+#!/bin/sh
+
+# Provision a new user on a linux system with a minimal set of configuration.
+#   author: Yoshua Wuyts
+
+# make sure deps exist
+which ssh > /dev/null || { echo 'Error: ssh required' && exit 1; }
+which scp > /dev/null || { echo 'Error: scp required' && exit 1; }
+
+usage () {
+  cat < ./usage.txt
+}
+
+# set CLI flags
+getopt -T > /dev/null
+if [ "$?" -eq 4 ]; then args="$(getopt --long help --options h -- "$*")"
+else args="$(getopt h "$*")"; fi
+[ ! $? -eq 0 ] && { usage && exit 2; }
+eval set -- "$args"
+
+# parse CLI flags
+while true; do
+  case "$1" in
+    -h|--help) usage && exit 1 ;;
+    -- ) shift; break ;;
+    * ) break ;;
+  esac
+done
+
+# parse arguments
+[ $# != 1 ] && { echo 'Error: remote required' && usage && exit 2; }
+remote="$1"
+
+# copy files over ssh
+for file in dotfiles/*; do
+  [ -e "$file" ] || break
+  dest="$(echo "$file" | sed 's/^dotfiles\//\./g')"
+  scp "$file" "$remote":~/"$dest"
+done
