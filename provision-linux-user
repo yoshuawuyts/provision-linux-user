@@ -1,39 +1,68 @@
 #!/bin/sh
+# shellcheck disable=SC2088
 
 # Provision a new user on a linux system with a minimal set of configuration.
-#   author: Yoshua Wuyts
+main () {
+  while true; do
+    case "$1" in
+      -h|--help) usage && exit 1 ;;
+      -- ) shift; break ;;
+      * ) break ;;
+    esac
+  done
 
-# make sure deps exist
-which ssh > /dev/null || { echo 'Error: ssh required' && exit 1; }
-which scp > /dev/null || { echo 'Error: scp required' && exit 1; }
+  if [ $# != 1 ]; then
+    printf "Error: ssh-remote-name required\n"
+    usage && exit 2
+  fi
 
-usage () {
-  cat < ./usage.txt
+  remote="$1"
+
+  assert_dep "ssh"
+  assert_dep "scp"
+
+  printf "copying files to %s\n" "$remote"
+  copy_files "$remote"
+
+  printf "creating directories on %s\n" "$remote"
+  create_ssh_dir "$remote" "~/db"
+  create_ssh_dir "$remote" "~/image"
+  create_ssh_dir "$remote" "~/log"
+  create_ssh_dir "$remote" "~/script"
+  create_ssh_dir "$remote" "~/service"
+  create_ssh_dir "$remote" "~/tmp"
 }
 
-# set CLI flags
+usage () {
+  printf "usage: provision-linux-user <ssh-remote-name>\n"
+}
+
+assert_dep () {
+  "$1" --help > /dev/null 2>&1
+  [ $? -eq 0 ] && return
+  [ $? -ne 0 ] && man "$1" > /dev/null
+  [ $? -ne 0 ] && printf "dependency %s not found\n" "$1" && exit 1
+}
+
+copy_files () {
+  dest="$1"
+  for file in dotfiles/*; do
+    [ -e "$file" ] || break
+    dest="$(echo "$file" | sed 's/^dotfiles\//\./g')"
+    scp "$file" "$remote":~/"$dest"
+  done
+}
+
+# shellcheck disable=SC2029
+create_ssh_dir () {
+  remote="$1"
+  remotedir="$2"
+  ssh "$1" "mkdir -p $remotedir"
+}
+
 getopt -T > /dev/null
 if [ "$?" -eq 4 ]; then args="$(getopt --long help --options h -- "$*")"
 else args="$(getopt h "$*")"; fi
 [ ! $? -eq 0 ] && { usage && exit 2; }
 eval set -- "$args"
-
-# parse CLI flags
-while true; do
-  case "$1" in
-    -h|--help) usage && exit 1 ;;
-    -- ) shift; break ;;
-    * ) break ;;
-  esac
-done
-
-# parse arguments
-[ $# != 1 ] && { echo 'Error: remote required' && usage && exit 2; }
-remote="$1"
-
-# copy files over ssh
-for file in dotfiles/*; do
-  [ -e "$file" ] || break
-  dest="$(echo "$file" | sed 's/^dotfiles\//\./g')"
-  scp "$file" "$remote":~/"$dest"
-done
+main "$@"

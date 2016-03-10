@@ -3,6 +3,7 @@ LC_ALL="C.UTF-8"
 
 # aliases
 alias ll="ls -oahpln --color=auto --group-directories-first -o"
+alias l="ls -ohpln --color=auto --group-directories-first -o"
 alias e="vim"
 alias g="git"
 alias s="git status"
