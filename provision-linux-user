@@ -3,6 +3,7 @@
 
 # Provision a new user on a linux system with a minimal set of configuration.
 main () {
+  # find command
   while true; do
     case "$1" in
       -h|--help) usage && exit 1 ;;
@@ -11,6 +12,7 @@ main () {
     esac
   done
 
+  # verify arg count
   if [ $# != 1 ]; then
     printf "Error: ssh-remote-name required\n"
     usage && exit 2
@@ -44,6 +46,7 @@ assert_dep () {
   [ $? -ne 0 ] && printf "dependency %s not found\n" "$1" && exit 1
 }
 
+# copy all files in ./dotfiles to remote host
 copy_files () {
   dest="$1"
   for file in dotfiles/*; do
@@ -60,6 +63,7 @@ create_ssh_dir () {
   ssh "$1" "mkdir -p $remotedir"
 }
 
+# reorder args and pass to main()
 getopt -T > /dev/null
 if [ "$?" -eq 4 ]; then args="$(getopt --long help --options h -- "$*")"
 else args="$(getopt h "$*")"; fi
