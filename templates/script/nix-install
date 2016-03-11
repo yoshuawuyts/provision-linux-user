@@ -1,0 +1,35 @@
+#!/bin/sh
+
+unpack=nix-binary-tarball-unpack
+version="1.11.2"
+
+main () {
+  case "$(uname -s).$(uname -m)" in
+    Linux.x86_64) system=x86_64-linux ;;
+    Linux.i?86) system=i686-linux ;;
+    Darwin.x86_64) system=x86_64-darwin ;;
+    *) printf '%s system not supported' "$system" && exit 1 ;;
+  esac
+
+  base_url="https://nixos.org"
+  url="$base_url/releases/nix/nix-$version/nix-$version-$system.tar.bz2"
+
+  assert_dep "curl"
+  assert_dep "bzcat"
+  assert_dep "tar"
+  assert_dep "bash"
+
+  printf "unpacking Nix binary tarball for %s from \'%s'...\n" "$system" "$url"
+  mkdir "$unpack" || { printf "could not create dir %s\n" "$unpack"; exit 1; }
+  curl -L "$url" | bzcat | tar x -C "$unpack" || oops "failed to unpack \$url"
+
+  "$unpack"/*/install
+  rm -rf "$unpack"
+}
+
+assert_dep () {
+  "$1" --help 2> /dev/null > /dev/null
+  [ $? -ne 0 ] && printf "dependency %s not found\n" "$1" && exit 1
+}
+
+main
