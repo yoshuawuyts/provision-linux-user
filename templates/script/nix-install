@@ -21,15 +21,21 @@ main () {
 
   printf "unpacking Nix binary tarball for %s from \'%s'...\n" "$system" "$url"
   mkdir "$unpack" || { printf "could not create dir %s\n" "$unpack"; exit 1; }
-  curl -L "$url" | bzcat | tar x -C "$unpack" || oops "failed to unpack \$url"
+  curl -L "$url" \
+    | bzcat \
+    | tar x -C "$unpack" || { printf 'faile to unpack\n'; exit 1; }
 
   "$unpack"/*/install
-  rm -rf "$unpack"
+  clean
 }
 
 assert_dep () {
   "$1" --help 2> /dev/null > /dev/null
   [ $? -ne 0 ] && printf "dependency %s not found\n" "$1" && exit 1
+}
+
+clean () {
+  rm -rf "$unpack"
 }
 
 main
