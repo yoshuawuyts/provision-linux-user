@@ -23,9 +23,6 @@ main () {
   assert_dep "ssh"
   assert_dep "scp"
 
-  printf "copying files to %s\n" "$remote"
-  copy_files "./templates" "$remote"
-
   printf "creating directories on %s\n" "$remote"
   create_ssh_dir "$remote" "~/db"
   create_ssh_dir "$remote" "~/image"
@@ -33,6 +30,9 @@ main () {
   create_ssh_dir "$remote" "~/script"
   create_ssh_dir "$remote" "~/service"
   create_ssh_dir "$remote" "~/tmp"
+
+  printf "copying files to %s\n" "$remote"
+  copy_files "./templates" "$remote"
 }
 
 usage () {
@@ -49,11 +49,12 @@ assert_dep () {
 # copy all files in ./templates to remote host
 copy_files () {
   dir="$1"; remote="$2"
-  find "$dir" | while read file; do
-    [ -e "$file" ] || break
-    file="$(echo "$file" | sed 's/^templates\//\./g')"
-    file="$(echo "$file" | sed 's/^\_/\./g')"
-    scp "$file" "$remote":~/"$file"
+  find "$dir" | while read infile; do
+    [ -e "$infile" ] || break
+    [ -d "$infile" ] && continue
+    outfile="$(echo "$infile" | sed 's|^\./templates/||g')"
+    outfile="$(echo "$outfile" | sed 's/^\_/\./g')"
+    scp -p "$infile" "$remote":~/"$outfile"
   done
 }
 
