@@ -24,7 +24,7 @@ main () {
   assert_dep "scp"
 
   printf "copying files to %s\n" "$remote"
-  copy_files "$remote"
+  copy_files "./templates" "$remote"
 
   printf "creating directories on %s\n" "$remote"
   create_ssh_dir "$remote" "~/db"
@@ -46,13 +46,14 @@ assert_dep () {
   [ $? -ne 0 ] && printf "dependency %s not found\n" "$1" && exit 1
 }
 
-# copy all files in ./dotfiles to remote host
+# copy all files in ./templates to remote host
 copy_files () {
-  dest="$1"
-  for file in dotfiles/*; do
+  dir="$1"; remote="$2"
+  find "$dir" | while read file; do
     [ -e "$file" ] || break
-    dest="$(echo "$file" | sed 's/^dotfiles\//\./g')"
-    scp "$file" "$remote":~/"$dest"
+    file="$(echo "$file" | sed 's/^templates\//\./g')"
+    file="$(echo "$file" | sed 's/^\_/\./g')"
+    scp "$file" "$remote":~/"$file"
   done
 }
 
