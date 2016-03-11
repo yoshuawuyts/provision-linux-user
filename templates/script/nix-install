@@ -23,7 +23,7 @@ main () {
   mkdir "$unpack" || { printf "could not create dir %s\n" "$unpack"; exit 1; }
   curl -L "$url" \
     | bzcat \
-    | tar x -C "$unpack" || { printf 'faile to unpack\n'; exit 1; }
+    | tar x -C "$unpack" || { printf 'failed to unpack\n'; exit 1; }
 
   "$unpack"/*/install
   clean
