@@ -17,6 +17,14 @@ main () {
   fi
 
   trap clean SIGHUP SIGINT SIGTERM
+
+  assert_dep "tar"
+
+  outdir="$HOME/service"
+  infile="$HOME/image/$1"
+
+  mkdir -p "$outdir/$infile"
+  tar -xzf "$infile" -C "$outdir/$infile"
 }
 
 usage () {
