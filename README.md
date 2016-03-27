@@ -1,5 +1,5 @@
 # provision-linux-user
-Provision a new user on a linux system with a minimal set of configuration.
+Provision a linux system with a minimal config.
 - `vi` focused
 - one-key aliases
 - universal shell config
