@@ -1,6 +1,6 @@
 {
   "name": "provision-linux-user",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Provision a linux system with a minimal config",
   "bin": {
     "provision-linux-user": "./provision-linux-user"
