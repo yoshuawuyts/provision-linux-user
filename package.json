@@ -2,7 +2,6 @@
   "name": "provision-linux-user",
   "version": "1.0.0",
   "description": "Provision a linux system with a minimal config",
-  "main": "index.js",
   "bin": "./provision-linux-user",
   "repository": "https://github.com/yoshuawuyts/provision-linux-user",
   "keywords": [ "bin", "config", "linux" ],
